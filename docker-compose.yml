@@ -1,0 +1,25 @@
+version: '3'
+services:
+  redis:
+    image: 'redis'
+    container_name: &redis-server 'vav-redis'
+    expose:
+      - &redis-port 6379
+    ports:
+      - '6379:6379'
+  web:
+    build: '.'
+    image: 'golang:1.12.17'
+    container_name: 'vav-web-service'
+    volumes:
+      - ~/go:/go
+      - ./:/vav:ro
+    command: go run /vav/web/server.go 8080
+    ports:
+      - '8080:8080'
+    environment:
+      GO111MODULE: "on"
+      REDIS-SERVER: *redis-server
+      REDIS-PORT: *redis-port
+    depends_on:
+      - redis
